@@ -46,16 +46,16 @@ class UlyssesStreams {
     }
 
     setupRouter() {
-        // ブラウザの戻る/進むボタン対応
-        window.addEventListener('popstate', (e) => {
+        // ハッシュ変更の監視
+        window.addEventListener('hashchange', (e) => {
             this.handleRoute();
         });
     }
 
     handleInitialRoute() {
-        const path = window.location.pathname;
+        const hash = window.location.hash;
         
-        if (path === '/shopping-list/') {
+        if (hash === '#shopping-list') {
             // 買い物リストストリームを探して選択
             const shoppingStream = this.streams.find(s => s.type === 'shopping');
             if (shoppingStream) {
@@ -69,9 +69,9 @@ class UlyssesStreams {
     }
 
     handleRoute() {
-        const path = window.location.pathname;
+        const hash = window.location.hash;
         
-        if (path === '/shopping-list/') {
+        if (hash === '#shopping-list') {
             const shoppingStream = this.streams.find(s => s.type === 'shopping');
             if (shoppingStream) {
                 this.selectStream(shoppingStream.id);
@@ -83,15 +83,15 @@ class UlyssesStreams {
 
     updateURL(streamType) {
         const routes = {
-            shopping: '/shopping-list/',
-            todo: '/todo-list/',
-            memo: '/memo-list/'
+            shopping: '#shopping-list',
+            todo: '#todo-list',
+            memo: '#memo-list'
         };
         
-        const newPath = routes[streamType] || '/';
+        const newHash = routes[streamType] || '';
         
-        if (window.location.pathname !== newPath) {
-            window.history.pushState({ streamType }, '', newPath);
+        if (window.location.hash !== newHash) {
+            window.location.hash = newHash;
         }
     }
 
@@ -562,6 +562,12 @@ class UlyssesStreams {
 
         // イベントリスナーを追加
         this.bindShoppingEvents(stream);
+        
+        // 購入物フォームにフォーカスを設定
+        const itemInput = document.getElementById('newItem');
+        if (itemInput) {
+            setTimeout(() => itemInput.focus(), 100);
+        }
     }
 
     calculateTotal(posts) {
@@ -574,7 +580,7 @@ class UlyssesStreams {
         return posts.map(post => {
             const postDate = new Date(post.data?.datetime || post.createdAt);
             const elapsedSeconds = (now - postDate) / 1000;
-            const isOld = elapsedSeconds >= 10;
+            const isOld = elapsedSeconds >= 86400; // 24時間 = 86400秒
             const rowClass = isOld ? 'table-row old-post' : 'table-row';
             
             const formattedDate = this.formatDateTime(postDate);
@@ -625,6 +631,9 @@ class UlyssesStreams {
             // フォームをリセット
             itemInput.value = '';
             priceInput.value = '';
+            
+            // 購入物フォームにフォーカスを戻す
+            itemInput.focus();
         });
 
         // Enterキーで追加
