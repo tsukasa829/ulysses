@@ -1,0 +1,384 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    height: 100vh;
+    overflow: hidden;
+    background-color: #f5f5f5;
+}
+
+.app {
+    display: flex;
+    height: 100vh;
+}
+
+/* 左側のサイドバー */
+.sidebar {
+    width: 300px;
+    background-color: #2c3e50;
+    color: white;
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar-header {
+    padding: 20px;
+    background-color: #34495e;
+    border-bottom: 1px solid #3e515e;
+}
+
+.sidebar-header h1 {
+    font-size: 24px;
+    margin-bottom: 15px;
+    color: #ecf0f1;
+}
+
+.header-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.new-memo-btn, .new-folder-btn {
+    width: 100%;
+    padding: 8px 12px;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 13px;
+    transition: background-color 0.3s;
+}
+
+.new-folder-btn {
+    background-color: #f39c12;
+}
+
+.new-memo-btn:hover {
+    background-color: #2980b9;
+}
+
+.new-folder-btn:hover {
+    background-color: #e67e22;
+}
+
+.tree-container {
+    flex: 1;
+    overflow-y: auto;
+    padding: 10px 0;
+}
+
+.tree-view {
+    padding: 0;
+}
+
+/* フォルダスタイル */
+.folder {
+    margin-bottom: 5px;
+}
+
+.folder-header {
+    padding: 8px 15px;
+    cursor: pointer;
+    border-bottom: 1px solid #34495e;
+    transition: background-color 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.folder-header:hover {
+    background-color: #34495e;
+}
+
+.folder-header.expanded {
+    background-color: #34495e;
+}
+
+.folder-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.folder-toggle {
+    font-size: 12px;
+    transition: transform 0.3s;
+}
+
+.folder-toggle.expanded {
+    transform: rotate(90deg);
+}
+
+.folder-name {
+    font-weight: 500;
+    color: #f39c12;
+}
+
+.folder-actions {
+    display: flex;
+    gap: 5px;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.folder-header:hover .folder-actions {
+    opacity: 1;
+}
+
+.folder-action-btn {
+    background: none;
+    border: none;
+    color: #95a5a6;
+    cursor: pointer;
+    font-size: 14px;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 3px;
+}
+
+.folder-action-btn:hover {
+    background-color: #3498db;
+    color: white;
+}
+
+.folder-action-btn.delete:hover {
+    background-color: #e74c3c;
+}
+
+/* メモリスト（フォルダ内） */
+.memo-list {
+    background-color: #2c3e50;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+}
+
+.memo-list.expanded {
+    max-height: 500px;
+}
+
+.memo-item {
+    padding: 8px 30px;
+    cursor: pointer;
+    border-bottom: 1px solid #34495e;
+    transition: background-color 0.3s;
+    position: relative;
+}
+
+.memo-item:hover {
+    background-color: #34495e;
+}
+
+.memo-item.active {
+    background-color: #3498db;
+}
+
+.memo-title {
+    font-weight: 400;
+    margin-bottom: 3px;
+    font-size: 14px;
+}
+
+.memo-preview {
+    font-size: 11px;
+    color: #95a5a6;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.memo-close {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: #95a5a6;
+    cursor: pointer;
+    font-size: 14px;
+    width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 3px;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.memo-item:hover .memo-close {
+    opacity: 1;
+}
+
+.memo-close:hover {
+    background-color: #e74c3c;
+    color: white;
+}
+
+/* 右側のエディタエリア */
+.editor-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background-color: white;
+}
+
+.editor-header {
+    padding: 20px;
+    background-color: #ecf0f1;
+    border-bottom: 1px solid #bdc3c7;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.memo-title {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #bdc3c7;
+    border-radius: 5px;
+    font-size: 16px;
+    font-weight: 500;
+}
+
+.memo-title:focus {
+    outline: none;
+    border-color: #3498db;
+}
+
+.editor-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.save-btn, .delete-btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s;
+}
+
+.save-btn {
+    background-color: #27ae60;
+    color: white;
+}
+
+.save-btn:hover {
+    background-color: #229954;
+}
+
+.delete-btn {
+    background-color: #e74c3c;
+    color: white;
+}
+
+.delete-btn:hover {
+    background-color: #c0392b;
+}
+
+.editor {
+    flex: 1;
+    padding: 20px;
+    border: none;
+    resize: none;
+    font-size: 14px;
+    line-height: 1.6;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.editor:focus {
+    outline: none;
+}
+
+.editor-footer {
+    padding: 10px 20px;
+    background-color: #ecf0f1;
+    border-top: 1px solid #bdc3c7;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 12px;
+    color: #7f8c8d;
+}
+
+.status.saved {
+    color: #27ae60;
+}
+
+.status.unsaved {
+    color: #e67e22;
+}
+
+/* 空の状態 */
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: #95a5a6;
+    text-align: center;
+}
+
+.empty-state h2 {
+    margin-bottom: 10px;
+    font-size: 24px;
+}
+
+.empty-state p {
+    font-size: 16px;
+}
+
+/* レスポンシブデザイン */
+@media (max-width: 768px) {
+    .sidebar {
+        width: 250px;
+    }
+    
+    .editor-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .editor-actions {
+        justify-content: center;
+        margin-top: 10px;
+    }
+}
+
+/* ボタンのdisabled状態スタイル */
+button:disabled,
+.new-memo-btn:disabled,
+.new-folder-btn:disabled,
+.folder-action-btn:disabled,
+.memo-close:disabled,
+.save-btn:disabled,
+.delete-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    background: #95a5a6 !important;
+    pointer-events: none;
+}
+
+button:disabled:hover,
+.new-memo-btn:disabled:hover,
+.new-folder-btn:disabled:hover,
+.folder-action-btn:disabled:hover,
+.memo-close:disabled:hover,
+.save-btn:disabled:hover,
+.delete-btn:disabled:hover {
+    background: #95a5a6 !important;
+    transform: none;
+}
