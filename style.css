@@ -19,22 +19,24 @@ body {
 /* 左側のサイドバー */
 .sidebar {
     width: 300px;
-    background-color: #2c3e50;
-    color: white;
+    background-color: #ffffff;
+    color: #2c3e50;
     display: flex;
     flex-direction: column;
+    border-right: 1px solid #e9ecef;
 }
 
 .sidebar-header {
     padding: 20px;
-    background-color: #34495e;
-    border-bottom: 1px solid #3e515e;
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #e9ecef;
 }
 
 .sidebar-header h1 {
     font-size: 24px;
     margin-bottom: 15px;
-    color: #ecf0f1;
+    color: #2c3e50;
+    font-weight: 600;
 }
 
 .header-actions {
@@ -77,12 +79,12 @@ body {
     padding: 0;
 }
 
-/* フォルダスタイル */
-.folder {
+/* ストリームスタイル */
+.stream, .folder {
     margin-bottom: 5px;
 }
 
-.folder-header {
+.stream-header, .folder-header {
     padding: 8px 15px;
     cursor: pointer;
     border-bottom: 1px solid #34495e;
@@ -90,20 +92,62 @@ body {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    background-color: #f8f9fa;
+    color: #2c3e50;
+    border-radius: 4px;
+    margin-bottom: 4px;
+    border: 1px solid #e9ecef;
 }
 
-.folder-header:hover {
-    background-color: #34495e;
+.stream-header:hover, .folder-header:hover {
+    background-color: #e9ecef;
+    color: #2c3e50;
 }
 
 .folder-header.expanded {
-    background-color: #34495e;
+    background-color: #e9ecef;
+    color: #2c3e50;
 }
 
-.folder-info {
+.stream-header.selected {
+    background-color: #3498db !important;
+    color: white;
+    border-color: #2980b9;
+}
+
+.stream-header.selected .stream-name {
+    color: white;
+    font-weight: 600;
+}
+
+.stream-header.selected .post-count {
+    color: #ecf0f1;
+    background-color: rgba(255, 255, 255, 0.2);
+    padding: 2px 6px;
+    border-radius: 12px;
+    font-size: 12px;
+}
+
+.stream-info, .folder-info {
     display: flex;
     align-items: center;
     gap: 8px;
+}
+
+.stream-name, .folder-name {
+    font-size: 14px;
+    font-weight: 500;
+    color: inherit;
+}
+
+.post-count, .memo-count {
+    font-size: 12px;
+    color: #7f8c8d;
+    background-color: #e9ecef;
+    padding: 2px 6px;
+    border-radius: 10px;
+    min-width: 20px;
+    text-align: center;
 }
 
 .folder-toggle {
@@ -360,10 +404,10 @@ body {
 
 /* ボタンのdisabled状態スタイル */
 button:disabled,
-.new-memo-btn:disabled,
-.new-folder-btn:disabled,
-.folder-action-btn:disabled,
-.memo-close:disabled,
+.new-post-btn:disabled,
+.new-stream-btn:disabled,
+.stream-action-btn:disabled,
+.post-close:disabled,
 .save-btn:disabled,
 .delete-btn:disabled {
     opacity: 0.6;
@@ -373,12 +417,294 @@ button:disabled,
 }
 
 button:disabled:hover,
-.new-memo-btn:disabled:hover,
-.new-folder-btn:disabled:hover,
-.folder-action-btn:disabled:hover,
-.memo-close:disabled:hover,
+.new-post-btn:disabled:hover,
+.new-stream-btn:disabled:hover,
+.stream-action-btn:disabled:hover,
+.post-close:disabled:hover,
 .save-btn:disabled:hover,
 .delete-btn:disabled:hover {
     background: #95a5a6 !important;
     transform: none;
+}
+
+/* モーダルスタイル */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    max-width: 500px;
+    width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+.modal-content h3 {
+    margin: 0 0 20px 0;
+    color: #2c3e50;
+    font-size: 18px;
+    text-align: center;
+}
+
+.stream-types {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.stream-type-btn {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 15px;
+    border: 2px solid #ecf0f1;
+    border-radius: 8px;
+    background: white;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: left;
+}
+
+.stream-type-btn:hover {
+    border-color: #3498db;
+    background: #f8f9fa;
+    transform: translateY(-1px);
+}
+
+.stream-type-btn .icon {
+    font-size: 24px;
+    min-width: 30px;
+}
+
+.stream-type-btn .name {
+    font-weight: bold;
+    color: #2c3e50;
+    font-size: 16px;
+}
+
+.stream-type-btn .description {
+    color: #7f8c8d;
+    font-size: 12px;
+    margin-top: 2px;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.cancel-btn {
+    padding: 8px 16px;
+    border: 1px solid #bdc3c7;
+    border-radius: 4px;
+    background: white;
+    color: #7f8c8d;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.cancel-btn:hover {
+    background: #ecf0f1;
+    border-color: #95a5a6;
+}
+
+/* ストリーム表示スタイル */
+.stream-view {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.stream-header {
+    padding: 20px;
+    border-bottom: 1px solid #ecf0f1;
+    background: #f8f9fa;
+}
+
+.stream-header h2 {
+    margin: 0 0 15px 0;
+    color: #2c3e50;
+    font-size: 20px;
+}
+
+.stream-form {
+    display: flex;
+    gap: 15px;
+    align-items: end;
+    flex-wrap: wrap;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.form-group label {
+    font-size: 12px;
+    color: #7f8c8d;
+    font-weight: bold;
+}
+
+.form-group input {
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    min-width: 120px;
+}
+
+.add-post-btn {
+    padding: 8px 16px;
+    background: #3498db;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    height: fit-content;
+}
+
+.add-post-btn:hover {
+    background: #2980b9;
+}
+
+.posts-list {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+}
+
+.posts-summary {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    padding: 10px 15px;
+    background: #f8f9fa;
+    border-radius: 6px;
+}
+
+.total-count {
+    color: #7f8c8d;
+    font-size: 14px;
+}
+
+.total-amount {
+    color: #27ae60;
+    font-weight: bold;
+    font-size: 16px;
+}
+
+.posts-table {
+    border: 1px solid #ecf0f1;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.table-header {
+    display: flex;
+    background: #34495e;
+    color: white;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.table-row {
+    display: flex;
+    border-bottom: 1px solid #ecf0f1;
+    transition: background 0.2s ease;
+}
+
+.table-row:hover {
+    background: #f8f9fa;
+}
+
+.table-row:last-child {
+    border-bottom: none;
+}
+
+.table-row.old-post {
+    background: #d5f4e6;
+    border-left: 3px solid #27ae60;
+}
+
+.table-row.old-post:hover {
+    background: #c7eed8;
+}
+
+.table-row.old-post .col-datetime {
+    color: #27ae60;
+    font-weight: bold;
+}
+
+.col-item {
+    flex: 2;
+    padding: 12px 15px;
+    font-weight: 500;
+}
+
+.col-price {
+    flex: 1;
+    padding: 12px 15px;
+    text-align: right;
+    color: #27ae60;
+    font-weight: bold;
+}
+
+.col-datetime {
+    flex: 1;
+    padding: 12px 15px;
+    text-align: center;
+    color: #7f8c8d;
+}
+
+.col-actions {
+    flex: 1;
+    padding: 12px 15px;
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+}
+
+.edit-post-btn, .delete-post-btn {
+    padding: 4px 8px;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: all 0.2s ease;
+}
+
+.edit-post-btn {
+    background: #f39c12;
+    color: white;
+}
+
+.edit-post-btn:hover {
+    background: #e67e22;
+}
+
+.delete-post-btn {
+    background: #e74c3c;
+    color: white;
+}
+
+.delete-post-btn:hover {
+    background: #c0392b;
 }

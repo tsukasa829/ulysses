@@ -14,14 +14,13 @@
             <div class="sidebar-header">
                 <h1>Ulysses</h1>
                 <div class="header-actions">
-                    <button class="new-folder-btn" id="newFolderBtn">📁 新規フォルダ</button>
-                    <button class="new-memo-btn" id="newMemoBtn">📝 新規メモ</button>
+                    <button class="new-post-btn" id="newPostBtn">📝 新規ポスト</button>
                 </div>
             </div>
             
             <div class="tree-container">
                 <div class="tree-view" id="treeView">
-                    <!-- フォルダとメモの階層がここに動的に追加される -->
+                    <!-- ストリームの階層がここに動的に追加される -->
                 </div>
             </div>
         </div>
@@ -29,14 +28,14 @@
         <!-- 右側のエディタエリア -->
         <div class="editor-area">
             <div class="editor-header">
-                <input type="text" class="memo-title" id="memoTitle" placeholder="メモのタイトル">
+                <input type="text" class="post-title" id="postTitle" placeholder="ポストのタイトル">
                 <div class="editor-actions">
                     <button class="save-btn" id="saveBtn">保存</button>
                     <button class="delete-btn" id="deleteBtn">削除</button>
                 </div>
             </div>
             
-            <textarea class="editor" id="editor" placeholder="ここにメモを書いてください..."></textarea>
+            <textarea class="editor" id="editor" placeholder="ここにコンテンツを書いてください..."></textarea>
             
             <div class="editor-footer">
                 <span class="status" id="status">準備完了</span>
