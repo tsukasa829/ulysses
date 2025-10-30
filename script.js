@@ -524,38 +524,61 @@ class UlyssesStreams {
         const editorArea = document.querySelector('.editor-area');
         
         editorArea.innerHTML = `
-            <div class="stream-view">
-                <div class="stream-header">
-                    <h2>🛒 ${stream.name}</h2>
-                    <div class="stream-form">
-                        <div class="form-group">
-                            <label>購入物</label>
-                            <input type="text" id="newItem" placeholder="商品名を入力">
+            <div class="box has-background-white shopping-form">
+                <h2 class="title is-4 has-text-dark">
+                    <i class="fas fa-shopping-cart"></i>
+                    ${stream.name}
+                </h2>
+                <div class="columns">
+                    <div class="column">
+                        <div class="field">
+                            <label class="label has-text-dark">購入物</label>
+                            <div class="control has-icons-left">
+                                <input class="input" type="text" id="newItem" placeholder="商品名を入力">
+                                <span class="icon is-small is-left">
+                                    <i class="fas fa-tag"></i>
+                                </span>
+                            </div>
                         </div>
-                        <div class="form-group">
-                            <label>金額</label>
-                            <input type="number" id="newPrice" placeholder="0" min="0">
+                    </div>
+                    <div class="column is-narrow">
+                        <div class="field">
+                            <label class="label has-text-dark">金額</label>
+                            <div class="control has-icons-left">
+                                <input class="input" type="number" id="newPrice" placeholder="0" min="0">
+                                <span class="icon is-small is-left">
+                                    <i class="fas fa-yen-sign"></i>
+                                </span>
+                            </div>
                         </div>
-                        <button class="add-post-btn" id="addShoppingPost">追加</button>
+                    </div>
+                    <div class="column is-narrow">
+                        <div class="field">
+                            <label class="label">&nbsp;</label>
+                            <div class="control">
+                                <button class="button is-primary" id="addShoppingPost">
+                                    <i class="fas fa-plus"></i>
+                                    <span>追加</span>
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                
-                <div class="posts-list">
-                    <div class="posts-summary">
-                        <span class="total-count">${stream.posts.length} 件</span>
-                        <span class="total-amount">合計: ¥${this.calculateTotal(stream.posts)}</span>
-                    </div>
-                    <div class="posts-table">
-                        <div class="table-header">
-                            <span class="col-item">購入物</span>
-                            <span class="col-price">金額</span>
-                            <span class="col-datetime">日時</span>
-                            <span class="col-actions">操作</span>
-                        </div>
-                        <div class="table-body" id="postsTableBody">
-                            ${this.renderShoppingPosts(stream.posts)}
-                        </div>
-                    </div>
+            </div>
+            
+            <div class="shopping-table has-background-white">
+                <div class="posts-summary has-background-light">
+                    <span class="tag is-info is-light">${stream.posts.length} 件</span>
+                    <span class="total-amount has-text-primary has-text-weight-bold">合計: ¥${this.calculateTotal(stream.posts)}</span>
+                </div>
+                <div class="table-header has-background-grey-lighter">
+                    <span class="col-item has-text-dark has-text-weight-semibold">購入物</span>
+                    <span class="col-price has-text-dark has-text-weight-semibold">金額</span>
+                    <span class="col-datetime has-text-dark has-text-weight-semibold">日時</span>
+                    <span class="col-actions has-text-dark has-text-weight-semibold">操作</span>
+                </div>
+                <div class="table-body" id="postsTableBody">
+                    ${this.renderShoppingPosts(stream.posts)}
                 </div>
             </div>
         `;
@@ -591,8 +614,12 @@ class UlyssesStreams {
                     <span class="col-price">¥${(post.data?.price || 0).toLocaleString()}</span>
                     <span class="col-datetime">${formattedDate}</span>
                     <span class="col-actions">
-                        <button class="edit-post-btn" data-post-id="${post.id}">編集</button>
-                        <button class="delete-post-btn" data-post-id="${post.id}">削除</button>
+                        <button class="button is-small is-info edit-post-btn" data-post-id="${post.id}">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="button is-small is-danger delete-post-btn" data-post-id="${post.id}">
+                            <i class="fas fa-trash"></i>
+                        </button>
                     </span>
                 </div>
             `;
@@ -648,11 +675,15 @@ class UlyssesStreams {
         // テーブルのイベント
         const tableBody = document.getElementById('postsTableBody');
         tableBody.addEventListener('click', (e) => {
-            const postId = parseInt(e.target.dataset.postId);
-            if (e.target.classList.contains('delete-post-btn')) {
+            // ボタンまたはその子要素（アイコン）がクリックされた場合の処理
+            const button = e.target.closest('.delete-post-btn, .edit-post-btn');
+            if (!button) return;
+            
+            const postId = parseInt(button.dataset.postId);
+            if (button.classList.contains('delete-post-btn')) {
                 this.deletePostById(postId);
-                this.showStreamView(stream); // 再表示
-            } else if (e.target.classList.contains('edit-post-btn')) {
+                this.showShoppingStreamView(stream); // 再表示
+            } else if (button.classList.contains('edit-post-btn')) {
                 this.editShoppingPost(postId);
             }
         });
@@ -750,51 +781,49 @@ class UlyssesStreams {
     renderTree() {
         if (!this.treeView) return;
         
-        this.treeView.innerHTML = '';
-
+        this.treeView.innerHTML = `
+            <p class="menu-label">ストリーム</p>
+            <ul class="menu-list" id="streamList"></ul>
+        `;
+        
+        const streamList = document.getElementById('streamList');
         this.streams.forEach(stream => {
             const streamElement = this.createStreamElement(stream);
-            this.treeView.appendChild(streamElement);
+            streamList.appendChild(streamElement);
         });
     }
 
     createStreamElement(stream) {
-        const streamDiv = document.createElement('div');
-        streamDiv.className = 'stream';
+        const streamLi = document.createElement('li');
         
-        const headerDiv = document.createElement('div');
         const isSelected = this.currentStreamId === stream.id;
-        headerDiv.className = `stream-header ${isSelected ? 'selected' : ''}`;
-        
-        // ストリームタイプに応じたアイコンを設定
         const icon = this.getStreamIcon(stream.type);
         
-        headerDiv.innerHTML = `
-            <div class="stream-info">
-                <span class="stream-name">${icon} ${stream.name}</span>
-                <span class="post-count">(${stream.posts.length})</span>
-            </div>
+        streamLi.innerHTML = `
+            <a class="${isSelected ? 'is-active' : ''}" data-stream-id="${stream.id}">
+                ${icon}
+                <span>${stream.name}</span>
+                <span class="tag is-rounded is-small">${stream.posts.length}</span>
+            </a>
         `;
         
         // ストリームクリックイベント
-        headerDiv.addEventListener('click', (e) => {
+        const link = streamLi.querySelector('a');
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
             this.selectStream(stream.id);
         });
         
-        streamDiv.appendChild(headerDiv);
-        
-        // ポストリストは表示しない（削除）
-        
-        return streamDiv;
+        return streamLi;
     }
 
     getStreamIcon(type) {
         const icons = {
-            memo: '📝',
-            shopping: '🛒',
-            todo: '✅'
+            memo: '<i class="fas fa-sticky-note"></i>',
+            shopping: '<i class="fas fa-shopping-cart"></i>',
+            todo: '<i class="fas fa-check-square"></i>'
         };
-        return icons[type] || '📄';
+        return icons[type] || '<i class="fas fa-file"></i>';
     }
 
     createPostElement(post, streamType) {
@@ -928,9 +957,12 @@ class UlyssesStreams {
         if (editorArea) {
             editorArea.innerHTML = `
                 <div class="empty-state">
-                    <h2>📝 ポストがありません</h2>
-                    <p>左側の「📝 新規ポスト」ボタンをクリックして<br>最初のポストを作成しましょう</p>
-                    <p>ストリームを作成してポストを整理することもできます</p>
+                    <div class="empty-state-icon has-text-grey-light">
+                        <i class="fas fa-feather-alt"></i>
+                    </div>
+                    <h3 class="title is-4 has-text-grey">ポストがありません</h3>
+                    <p class="subtitle is-6 has-text-grey">左側の「新規ポスト」ボタンをクリックして<br>最初のポストを作成しましょう</p>
+                    <p class="has-text-grey-light">ストリームを作成してポストを整理することもできます</p>
                 </div>
             `;
         }
@@ -940,19 +972,47 @@ class UlyssesStreams {
         const editorArea = document.querySelector('.editor-area');
         if (editorArea && editorArea.querySelector('.empty-state')) {
             editorArea.innerHTML = `
-                <div class="editor-header">
-                    <input type="text" class="post-title" id="postTitle" placeholder="ポストのタイトル">
-                    <div class="editor-actions">
-                        <button class="save-btn" id="saveBtn">保存</button>
-                        <button class="delete-btn" id="deleteBtn">削除</button>
+                <div class="box has-background-white editor-header">
+                    <div class="field has-addons">
+                        <div class="control is-expanded">
+                            <input type="text" class="input" id="postTitle" placeholder="ポストのタイトル">
+                        </div>
+                        <div class="control">
+                            <button class="button is-success" id="saveBtn">
+                                <i class="fas fa-save"></i>
+                                <span>保存</span>
+                            </button>
+                        </div>
+                        <div class="control">
+                            <button class="button is-danger" id="deleteBtn">
+                                <i class="fas fa-trash"></i>
+                                <span>削除</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
                 
-                <textarea class="editor" id="editor" placeholder="ここにコンテンツを書いてください..."></textarea>
+                <div class="box has-background-white editor-content">
+                    <div class="field">
+                        <div class="control">
+                            <textarea class="textarea is-medium" id="editor" rows="20" placeholder="ここにコンテンツを書いてください..."></textarea>
+                        </div>
+                    </div>
+                </div>
                 
-                <div class="editor-footer">
-                    <span class="status" id="status">準備完了</span>
-                    <span class="char-count" id="charCount">0 文字</span>
+                <div class="box has-background-white editor-footer">
+                    <div class="level">
+                        <div class="level-left">
+                            <div class="level-item">
+                                <span class="tag is-light" id="status">準備完了</span>
+                            </div>
+                        </div>
+                        <div class="level-right">
+                            <div class="level-item">
+                                <span class="tag is-info" id="charCount">0 文字</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             `;
             

@@ -5,41 +5,87 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ulysses - Simple Memo Tool</title>
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.0/css/bulma.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="app">
+    <div class="columns is-gapless is-fullheight">
         <!-- 左側のサイドバー -->
-        <div class="sidebar">
-            <div class="sidebar-header">
-                <h1>Ulysses</h1>
-                <div class="header-actions">
-                    <button class="new-post-btn" id="newPostBtn">📝 新規ポスト</button>
+        <div class="column is-3">
+            <div class="hero is-light">
+                <div class="hero-body">
+                    <div class="container">
+                        <h1 class="title is-3 has-text-dark">
+                            <i class="fas fa-feather-alt"></i>
+                            Ulysses
+                        </h1>
+                        <div class="field">
+                            <div class="control">
+                                <button class="button is-primary is-small is-fullwidth" id="newPostBtn">
+                                    <i class="fas fa-plus"></i>
+                                    <span>新規ポスト</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
             
-            <div class="tree-container">
-                <div class="tree-view" id="treeView">
-                    <!-- ストリームの階層がここに動的に追加される -->
-                </div>
+            <div class="sidebar-content has-background-white">
+                <aside class="menu">
+                    <div id="treeView">
+                        <!-- ストリームの階層がここに動的に追加される -->
+                    </div>
+                </aside>
             </div>
         </div>
 
         <!-- 右側のエディタエリア -->
-        <div class="editor-area">
-            <div class="editor-header">
-                <input type="text" class="post-title" id="postTitle" placeholder="ポストのタイトル">
-                <div class="editor-actions">
-                    <button class="save-btn" id="saveBtn">保存</button>
-                    <button class="delete-btn" id="deleteBtn">削除</button>
+        <div class="column">
+            <div class="editor-area has-background-white-bis">
+                <div class="box has-background-white editor-header">
+                    <div class="field has-addons">
+                        <div class="control is-expanded">
+                            <input type="text" class="input" id="postTitle" placeholder="ポストのタイトル">
+                        </div>
+                        <div class="control">
+                            <button class="button is-success" id="saveBtn">
+                                <i class="fas fa-save"></i>
+                                <span>保存</span>
+                            </button>
+                        </div>
+                        <div class="control">
+                            <button class="button is-danger" id="deleteBtn">
+                                <i class="fas fa-trash"></i>
+                                <span>削除</span>
+                            </button>
+                        </div>
+                    </div>
                 </div>
-            </div>
-            
-            <textarea class="editor" id="editor" placeholder="ここにコンテンツを書いてください..."></textarea>
-            
-            <div class="editor-footer">
-                <span class="status" id="status">準備完了</span>
-                <span class="char-count" id="charCount">0 文字</span>
+                
+                <div class="box has-background-white editor-content">
+                    <div class="field">
+                        <div class="control">
+                            <textarea class="textarea is-medium" id="editor" rows="20" placeholder="ここにコンテンツを書いてください..."></textarea>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="box has-background-white editor-footer">
+                    <div class="level">
+                        <div class="level-left">
+                            <div class="level-item">
+                                <span class="tag is-light" id="status">準備完了</span>
+                            </div>
+                        </div>
+                        <div class="level-right">
+                            <div class="level-item">
+                                <span class="tag is-info" id="charCount">0 文字</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
