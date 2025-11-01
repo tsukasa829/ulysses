@@ -203,6 +203,25 @@ class UlyssesStreams {
                     fields: ['task', 'priority', 'dueDate', 'completed'],
                     priorities: ['高', '中', '低']
                 }
+            },
+            {
+                id: this.nextStreamId++,
+                name: '🕰️ 過去',
+                type: 'past',
+                posts: [],
+                expanded: true,
+                createdAt: new Date().toISOString(),
+                config: {
+                    fields: ['event', 'pastEmotion', 'pastEmotionMessage', 'realWish', 'idealEmotion', 'idealEmotionMessage'],
+                    fieldLabels: {
+                        event: '出来事',
+                        pastEmotion: '過去の感情',
+                        pastEmotionMessage: '過去の感情を許可するメッセージ',
+                        realWish: '本当はどうしたい？',
+                        idealEmotion: '理想状態の感情',
+                        idealEmotionMessage: '理想状態の感情を許可するメッセージ'
+                    }
+                }
             }
         ];
         
@@ -513,6 +532,9 @@ class UlyssesStreams {
             case 'todo':
                 this.showTodoStreamView(stream);
                 break;
+            case 'past':
+                this.showPastStreamView(stream);
+                break;
             case 'memo':
             default:
                 this.showMemoStreamView(stream);
@@ -821,9 +843,303 @@ class UlyssesStreams {
         const icons = {
             memo: '<i class="fas fa-sticky-note"></i>',
             shopping: '<i class="fas fa-shopping-cart"></i>',
-            todo: '<i class="fas fa-check-square"></i>'
+            todo: '<i class="fas fa-check-square"></i>',
+            past: '<i class="fas fa-history"></i>'
         };
         return icons[type] || '<i class="fas fa-file"></i>';
+    }
+
+    showPastStreamView(stream) {
+        const editorArea = document.querySelector('.editor-area');
+        
+        editorArea.innerHTML = `
+            <div class="level has-background-white" style="padding: 1rem; margin-bottom: 1rem; border-radius: 6px;">
+                <div class="level-left">
+                    <div class="level-item">
+                        <h2 class="title is-4 has-text-dark">
+                            <i class="fas fa-history"></i>
+                            ${stream.name}
+                        </h2>
+                    </div>
+                </div>
+                <div class="level-right">
+                    <div class="level-item">
+                        <button class="button is-primary" id="openPastModal">
+                            <i class="fas fa-plus"></i>
+                            <span>新しい記録を追加</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="past-entries has-background-white" style="border: 1px solid #dbdbdb; border-radius: 6px;">
+                <div class="posts-summary has-background-light">
+                    <span class="tag is-info is-light">${stream.posts.length} 件の記録</span>
+                </div>
+                <div class="entries-container has-background-white" id="pastEntriesContainer" style="padding: 1rem; background-color: white !important;">
+                    ${this.renderPastPosts(stream.posts)}
+                </div>
+            </div>
+            
+            <!-- 過去記録追加モーダル -->
+            <div class="modal" id="pastModal">
+                <div class="modal-background"></div>
+                <div class="modal-card">
+                    <header class="modal-card-head has-background-primary">
+                        <p class="modal-card-title has-text-white">新しい過去の記録</p>
+                        <button class="delete" aria-label="close" id="closePastModal"></button>
+                    </header>
+                    <section class="modal-card-body has-background-white">
+                        <div class="field">
+                            <label class="label has-text-dark">出来事</label>
+                            <div class="control">
+                                <textarea class="textarea" id="pastEvent" placeholder="どのような出来事がありましたか？" rows="3"></textarea>
+                            </div>
+                        </div>
+                        
+                        <div class="columns">
+                            <div class="column">
+                                <div class="field">
+                                    <label class="label has-text-dark">過去の感情</label>
+                                    <div class="control">
+                                        <textarea class="textarea" id="pastEmotion" placeholder="その時どのような感情を感じましたか？" rows="3"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="column">
+                                <div class="field">
+                                    <label class="label has-text-dark">過去の感情を許可するメッセージ</label>
+                                    <div class="control">
+                                        <textarea class="textarea" id="pastEmotionMessage" placeholder="その感情を持っていても良いという許可のメッセージ" rows="3"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="field">
+                            <label class="label has-text-dark">本当はどうしたい？</label>
+                            <div class="control">
+                                <textarea class="textarea" id="realWish" placeholder="あなたが本当に望んでいることは何ですか？" rows="3"></textarea>
+                            </div>
+                        </div>
+                        
+                        <div class="columns">
+                            <div class="column">
+                                <div class="field">
+                                    <label class="label has-text-dark">理想状態の感情</label>
+                                    <div class="control">
+                                        <textarea class="textarea" id="idealEmotion" placeholder="理想の状態ではどのような感情でいたいですか？" rows="3"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="column">
+                                <div class="field">
+                                    <label class="label has-text-dark">理想状態の感情を許可するメッセージ</label>
+                                    <div class="control">
+                                        <textarea class="textarea" id="idealEmotionMessage" placeholder="その理想の感情を持つことを許可するメッセージ" rows="3"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                    <footer class="modal-card-foot has-background-white">
+                        <button class="button is-primary" id="savePastRecord">
+                            <i class="fas fa-save"></i>
+                            <span>記録を保存</span>
+                        </button>
+                        <button class="button" id="cancelPastModal">キャンセル</button>
+                    </footer>
+                </div>
+            </div>
+        `;
+
+        // イベントリスナーを追加
+        this.bindPastEvents(stream);
+        this.bindPastModalEvents(stream);
+    }
+
+    renderPastPosts(posts) {
+        const now = new Date();
+        
+        if (posts.length === 0) {
+            return '<div class="has-text-centered" style="padding: 2rem; color: #7a7a7a;">まだ記録がありません</div>';
+        }
+        
+        // 3列のグリッドレイアウトで表示
+        let html = '<div class="columns is-multiline">';
+        
+        posts.forEach(post => {
+            const postDate = new Date(post.createdAt);
+            const formattedDate = this.formatDateTime(postDate);
+            
+            html += `
+                <div class="column is-4">
+                    <div class="card past-entry-card has-background-white" data-post-id="${post.id}" style="height: 100%; border: 1px solid #e8e8e8;">
+                        <div class="card-header has-background-light">
+                            <div class="card-header-title has-text-dark is-size-7">
+                                <span class="tag is-info is-light is-small">${formattedDate}</span>
+                            </div>
+                            <div class="card-header-icon">
+                                <button class="button is-small is-danger delete-post-btn" data-post-id="${post.id}">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="card-content has-background-white" style="padding: 0.75rem;">
+                            <div class="past-content">
+                                <div class="field mb-3">
+                                    <label class="label is-small has-text-dark">出来事</label>
+                                    <div class="past-content-text has-background-white has-text-dark">${post.data?.event || ''}</div>
+                                </div>
+                                
+                                <div class="field mb-3">
+                                    <label class="label is-small has-text-dark">過去の感情</label>
+                                    <div class="past-content-text has-background-white has-text-dark">${post.data?.pastEmotion || ''}</div>
+                                </div>
+                                
+                                <div class="field mb-3">
+                                    <label class="label is-small has-text-dark">過去の感情を許可するメッセージ</label>
+                                    <div class="past-content-text has-background-white has-text-dark">${post.data?.pastEmotionMessage || ''}</div>
+                                </div>
+                                
+                                <div class="field mb-3">
+                                    <label class="label is-small has-text-dark">本当はどうしたい？</label>
+                                    <div class="past-content-text has-background-white has-text-dark">${post.data?.realWish || ''}</div>
+                                </div>
+                                
+                                <div class="field mb-3">
+                                    <label class="label is-small has-text-dark">理想状態の感情</label>
+                                    <div class="past-content-text has-background-white has-text-dark">${post.data?.idealEmotion || ''}</div>
+                                </div>
+                                
+                                <div class="field">
+                                    <label class="label is-small has-text-dark">理想状態の感情を許可するメッセージ</label>
+                                    <div class="past-content-text has-background-white has-text-dark">${post.data?.idealEmotionMessage || ''}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+        
+        html += '</div>';
+        return html;
+    }
+
+    bindPastEvents(stream) {
+        // エントリーの削除イベントのみ
+        const entriesContainer = document.getElementById('pastEntriesContainer');
+        if (entriesContainer) {
+            entriesContainer.addEventListener('click', (e) => {
+                const button = e.target.closest('.delete-post-btn');
+                if (!button) return;
+                
+                const postId = parseInt(button.dataset.postId);
+                if (confirm('この記録を削除しますか？')) {
+                    this.deletePostById(postId);
+                    this.showPastStreamView(stream); // 再表示
+                }
+            });
+        }
+    }
+
+    bindPastModalEvents(stream) {
+        const modal = document.getElementById('pastModal');
+        const openModalBtn = document.getElementById('openPastModal');
+        const closeModalBtn = document.getElementById('closePastModal');
+        const cancelModalBtn = document.getElementById('cancelPastModal');
+        const saveBtn = document.getElementById('savePastRecord');
+        const modalBackground = modal.querySelector('.modal-background');
+
+        // モーダルを開く
+        openModalBtn.addEventListener('click', () => {
+            modal.classList.add('is-active');
+            const eventInput = document.getElementById('pastEvent');
+            if (eventInput) {
+                setTimeout(() => eventInput.focus(), 100);
+            }
+        });
+
+        // モーダルを閉じる関数
+        const closeModal = () => {
+            modal.classList.remove('is-active');
+            this.clearPastModalForm();
+        };
+
+        // モーダルを閉じるイベント
+        closeModalBtn.addEventListener('click', closeModal);
+        cancelModalBtn.addEventListener('click', closeModal);
+        modalBackground.addEventListener('click', closeModal);
+
+        // ESCキーでモーダルを閉じる
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && modal.classList.contains('is-active')) {
+                closeModal();
+            }
+        });
+
+        // 記録を保存
+        saveBtn.addEventListener('click', () => {
+            const eventInput = document.getElementById('pastEvent');
+            const pastEmotionInput = document.getElementById('pastEmotion');
+            const pastEmotionMessageInput = document.getElementById('pastEmotionMessage');
+            const realWishInput = document.getElementById('realWish');
+            const idealEmotionInput = document.getElementById('idealEmotion');
+            const idealEmotionMessageInput = document.getElementById('idealEmotionMessage');
+
+            const event = eventInput.value.trim();
+            const pastEmotion = pastEmotionInput.value.trim();
+            const pastEmotionMessage = pastEmotionMessageInput.value.trim();
+            const realWish = realWishInput.value.trim();
+            const idealEmotion = idealEmotionInput.value.trim();
+            const idealEmotionMessage = idealEmotionMessageInput.value.trim();
+
+            if (!event) {
+                alert('出来事を入力してください');
+                eventInput.focus();
+                return;
+            }
+
+            this.addPastPost(stream.id, {
+                event,
+                pastEmotion,
+                pastEmotionMessage,
+                realWish,
+                idealEmotion,
+                idealEmotionMessage
+            });
+            
+            closeModal();
+        });
+    }
+
+    clearPastModalForm() {
+        const inputs = ['pastEvent', 'pastEmotion', 'pastEmotionMessage', 'realWish', 'idealEmotion', 'idealEmotionMessage'];
+        inputs.forEach(id => {
+            const input = document.getElementById(id);
+            if (input) input.value = '';
+        });
+    }
+
+    addPastPost(streamId, data) {
+        const stream = this.streams.find(s => s.id === streamId);
+        if (!stream) return;
+
+        const newPost = {
+            id: this.nextPostId++,
+            title: data.event.substring(0, 50) + (data.event.length > 50 ? '...' : ''), // タイトルは出来事の最初の50文字
+            streamId: streamId,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+            data: data
+        };
+
+        stream.posts.unshift(newPost);
+        this.saveData();
+        this.renderTree();
+        this.showStreamView(stream); // 再表示
     }
 
     createPostElement(post, streamType) {
